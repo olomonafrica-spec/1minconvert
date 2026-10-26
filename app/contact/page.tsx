@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ContactForm } from "@/components/contact-form";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -8,13 +10,21 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <div className="simple-page">
-      <div className="container simple-page-inner legal-copy">
+      <div className="container simple-page-inner contact-page">
         <span className="section-kicker">GET IN TOUCH</span>
-        <h1>Contact 1MinConvert</h1>
-        <p className="simple-lead">Questions about a tool, a privacy concern or feedback about the site? Send us an email.</p>
-        <p><strong>Email:</strong> <a href="mailto:contact@1minconvert.com">contact@1minconvert.com</a></p>
-        <p>Please do not email confidential files or sensitive personal information unless it is necessary for your request.</p>
-        <p>For information about how we handle site and tool usage, read our <a href="/privacy">Privacy Policy</a>.</p>
+        <h1>How can we help?</h1>
+        <p className="simple-lead">
+          Found a problem with a converter, have a suggestion, or need to ask a privacy question? Send us a message below.
+        </p>
+
+        <ContactForm />
+
+        <p className="contact-privacy-note">
+          Please do not include passwords, payment details, or confidential files. Read our <Link href="/privacy">Privacy Policy</Link> to learn how contact-form submissions are handled.
+        </p>
+        <p className="contact-email-fallback">
+          Prefer email? <a href="mailto:contact@1minconvert.com">contact@1minconvert.com</a>
+        </p>
       </div>
     </div>
   );

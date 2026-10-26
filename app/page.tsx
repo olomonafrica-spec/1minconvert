@@ -1,49 +1,102 @@
-import Link from "next/link";
-import { ArrowDownRight, ArrowRight, ArrowUpRight, FileImage, FileText, FileType, Gauge, Globe2, LockKeyhole, Maximize2, ShieldCheck, Zap } from "lucide-react";
-import { HeroHeicConverter } from "@/components/hero-heic-converter";
-import { tools } from "@/lib/tools";
+import type { Metadata } from "next";
 
-export default function HomePage() {
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "How 1MinConvert handles information when you use our online file tools.",
+};
+
+const contactEmail = "contact@1minconvert.com";
+
+export default function PrivacyPage() {
   return (
-    <>
-      <section className="hero-section">
-        <div className="hero-grid-bg" aria-hidden="true" />
-        <div className="container hero-content hero-content-action-first">
-          <div className="hero-copy">
-            <div className="hero-kicker"><span className="live-dot"/> FREE ONLINE IMAGE TOOL</div>
-            <h1>HEIC to JPG.<br/><span>Done in seconds.</span></h1>
-            <p className="hero-description">Turn iPhone photos into easy-to-share JPG files. Upload your photo, convert it, and download it right here.</p>
-            <div className="hero-reassurance hero-reassurance-prominent"><span><span className="mini-check" aria-hidden="true">✓</span> No sign-up</span><span><span className="mini-check" aria-hidden="true">✓</span> 100% free</span><span><span className="mini-check" aria-hidden="true">✓</span> Files stay on your device</span></div>
-            <div className="hero-actions"><Link href="#tools" className="text-link">Explore all image tools <ArrowDownRight size={15}/></Link></div>
-          </div>
-          <HeroHeicConverter />
-        </div>
-        <div className="container hero-bottom"><span>NO ACCOUNT. NO APP TO INSTALL.</span><div><span>HEIC TO JPG</span><i/> <span>WEBP CONVERSION</span><i/> <span>IMAGE COMPRESSION</span></div></div>
-      </section>
+    <div className="simple-page">
+      <div className="container simple-page-inner legal-copy">
+        <span className="section-kicker">LEGAL INFORMATION</span>
+        <h1>Privacy policy</h1>
+        <p className="simple-lead">
+          This policy explains how 1MinConvert handles information when you visit the site and use its file tools.
+        </p>
+        <p><strong>Last updated:</strong> October 26, 2026</p>
 
-      <section className="tools-section section" id="tools">
-        <div className="container">
-          <div className="section-heading"><div><span className="section-kicker">THE TOOLKIT</span><h2>Small tasks. <span>Made simple.</span></h2><p>Get the file you need without downloading another app.</p></div><div className="tool-count"><strong>04</strong><span>tools available<br/>in this first release</span></div></div>
-          <div className="tools-grid">
-            {tools.map((tool, index) => {
-              const iconMap = { "file-image": FileImage, "file-type": FileType, gauge: Gauge, maximize: Maximize2 } as const;
-              const Icon = iconMap[tool.iconKey];
-              const tone = ["blue", "coral", "green", "violet"][index];
-              return <Link href={`/tools/${tool.slug}`} className="tool-card" key={tool.slug}><div className={`tool-card-icon icon-${tone}`}><Icon size={23} strokeWidth={1.9}/></div><div className="tool-card-category">{tool.category}</div><h3>{tool.shortTitle}</h3><p>{tool.description}</p><div className="tool-card-link">Open tool <ArrowUpRight size={16}/></div><div className="card-number">0{index + 1}</div></Link>;
-            })}
-          </div>
-          <div className="coming-strip"><div className="coming-icon"><FileText size={20}/></div><div><strong>PDF tools are on the roadmap</strong><p>Merge, split, compress and organize PDFs. We're adding tools in stages, with reliability first.</p></div><span className="coming-label">COMING NEXT</span></div>
-        </div>
-      </section>
+        <h2>Files you process</h2>
+        <p>
+          The image tools currently offered by 1MinConvert are designed to process selected files in your browser. The
+          conversion features do not intentionally upload the selected image to a 1MinConvert file-processing server.
+          Your browser temporarily holds the selected file and any generated output while you use a tool. You are
+          responsible for saving the result you want to keep. This description applies to the tools as currently
+          implemented; the policy will be updated if future tools process files differently.
+        </p>
 
-      <section className="privacy-section section" id="why-us">
-        <div className="container privacy-layout">
-          <div className="privacy-copy"><span className="section-kicker">A BETTER WAY TO GET IT DONE</span><h2>Useful first.<br/><span>Complicated never.</span></h2><p>Online tools should make a job easier, not make you create an account or wonder where your files went.</p><Link href="/about" className="text-link">Our approach <ArrowUpRight size={15}/></Link></div>
-          <div className="principles-grid"><div className="principle-card"><div className="principle-icon principle-indigo"><LockKeyhole size={21}/></div><h3>Privacy-minded</h3><p>Supported tools process files in your browser instead of uploading them to our servers.</p></div><div className="principle-card"><div className="principle-icon principle-orange"><Zap size={21}/></div><h3>Simple by design</h3><p>Clear controls, helpful settings and an easy path from input to download.</p></div><div className="principle-card"><div className="principle-icon principle-green"><Globe2 size={21}/></div><h3>Made for everyone</h3><p>Works on modern desktop and mobile browsers, with no software to install.</p></div><div className="principle-card"><div className="principle-icon principle-pink"><ShieldCheck size={21}/></div><h3>Clear about limits</h3><p>We explain supported formats and known limitations rather than promising magic.</p></div></div>
-        </div>
-      </section>
+        <h2>Technical information</h2>
+        <p>
+          When you visit a website, the hosting provider and related infrastructure may process technical information
+          such as your IP address, browser and device details, requested page, referring page, and the date and time of
+          a request for delivery, security, troubleshooting and abuse prevention. The exact logs and retention periods
+          depend on the services used to host the live site.
+        </p>
 
-      <section className="closing-section"><div className="container closing-card"><div className="closing-decoration"/><div><span className="section-kicker">READY WHEN YOU ARE</span><h2>What do you need to do today?</h2><p>Pick a tool and get straight to work. No account, no extra steps.</p></div><Link href="#tools" className="button button-dark">Find your tool <ArrowRight size={17}/></Link></div></section>
-    </>
+        <h2>Cookies, analytics and advertising</h2>
+        <p>
+          1MinConvert does not claim that no cookies or similar technologies are used in every configuration. If
+          analytics, advertising or other third-party features are enabled, those providers may use cookies or similar
+          technologies and may process information under their own privacy policies. Before advertising is activated,
+          this policy and any required consent controls must reflect the actual advertising setup, including Google
+          AdSense where used.
+        </p>
+
+        <h2>Contact form submissions</h2>
+        <p>
+          If you submit the contact form, we receive the name, email address, topic and message you choose to provide.
+          The form is handled by Netlify Forms on our hosting platform. The information is stored in the site owner's
+          Netlify dashboard and may be sent to a notification address configured by the site owner so the request can
+          be answered. Netlify may apply automated spam filtering. Do not include passwords, payment details, private
+          files or other sensitive information in a message. Contact-form submissions are retained until the site owner
+          deletes them, subject to the hosting provider's functionality, retention practices and any applicable legal
+          obligations. You can request access to or deletion of a message by contacting us.
+        </p>
+
+        <h2>How information is used</h2>
+        <p>
+          Technical information may be used to deliver the site, protect its security, diagnose errors, understand
+          aggregate usage where analytics are enabled, and comply with legal obligations. We do not ask you to create an
+          account to use the current image tools.
+        </p>
+
+        <h2>Third-party services and links</h2>
+        <p>
+          The site may rely on third-party hosting, domain, security, analytics or advertising services. Those services
+          have their own terms and privacy practices. External links take you to sites we do not control.
+        </p>
+
+        <h2>Retention and your choices</h2>
+        <p>
+          Files processed locally remain under your browser's control; closing the page or tab normally clears the
+          temporary in-page state, but you should not treat the browser as a permanent backup. Technical logs and
+          information held by third-party services are retained according to the relevant provider's settings and
+          policies. You can contact us with a privacy question or request using the email below. Rights available to you
+          may depend on your location and applicable law.
+        </p>
+
+        <h2>Children</h2>
+        <p>
+          The site is intended as a general-purpose utility and is not designed to collect personal information from
+          children. Please contact us if you believe personal information has been provided inappropriately.
+        </p>
+
+        <h2>Changes to this policy</h2>
+        <p>
+          We may update this policy when the site's features, hosting or advertising arrangements change. The date at
+          the top indicates when this page was last updated.
+        </p>
+
+        <h2>Contact</h2>
+        <p>Privacy questions can be sent to <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>
+        <div className="legal-warning">
+          This page describes the current intended product and is not legal advice. Before public launch, confirm that
+          the live hosting, analytics, cookie, consent and advertising configuration matches this policy and obtain any
+          jurisdiction-specific review required for your circumstances.
+        </div>
+      </div>
+    </div>
   );
 }

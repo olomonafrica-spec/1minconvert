@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><title>1MinConvert form registration</title></head>
+  <body>
+    <!-- Netlify detects this static blueprint at deploy time. Keep form name and fields in sync with components/contact-form.tsx. -->
+    <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="contact">
+      <input type="hidden" name="subject" value="New 1MinConvert contact message">
+      <p hidden><label>Leave this field empty: <input name="bot-field"></label></p>
+      <label>Your name <input name="name" type="text"></label>
+      <label>Email address <input name="email" type="email"></label>
+      <label>What is this about?
+        <select name="topic">
+          <option value="feedback">Feedback or suggestion</option>
+          <option value="tool-issue">A tool is not working</option>
+          <option value="privacy">Privacy request</option>
+          <option value="other">Something else</option>
+        </select>
+      </label>
+      <label>Message <textarea name="message"></textarea></label>
+    </form>
+  </body>
+</html>

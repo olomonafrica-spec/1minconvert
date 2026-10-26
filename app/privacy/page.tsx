@@ -44,6 +44,17 @@ export default function PrivacyPage() {
           AdSense where used.
         </p>
 
+        <h2>Contact form submissions</h2>
+        <p>
+          If you submit the contact form, we receive the name, email address, topic and message you choose to provide.
+          The form is handled by Netlify Forms on our hosting platform. The information is stored in the site owner's
+          Netlify dashboard and may be sent to a notification address configured by the site owner so the request can
+          be answered. Netlify may apply automated spam filtering. Do not include passwords, payment details, private
+          files or other sensitive information in a message. Contact-form submissions are retained until the site owner
+          deletes them, subject to the hosting provider's functionality, retention practices and any applicable legal
+          obligations. You can request access to or deletion of a message by contacting us.
+        </p>
+
         <h2>How information is used</h2>
         <p>
           Technical information may be used to deliver the site, protect its security, diagnose errors, understand
