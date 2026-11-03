@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 
 const siteUrl = "https://1minconvert.com";
+const adsenseId = "ca-pub-7148962958151517";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -29,10 +30,6 @@ export const metadata: Metadata = {
     "free online converter",
   ],
 
-  alternates: {
-    canonical: "/",
-  },
-
   openGraph: {
     type: "website",
     url: siteUrl,
@@ -46,6 +43,11 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+
+  // Google AdSense site ownership verification
+  other: {
+    "google-adsense-account": adsenseId,
+  },
 };
 
 export default function RootLayout({
@@ -56,11 +58,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        {/* Google AdSense */}
         <Script
           id="google-adsense"
-          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
           strategy="afterInteractive"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7148962958151517"
           crossOrigin="anonymous"
         />
 
