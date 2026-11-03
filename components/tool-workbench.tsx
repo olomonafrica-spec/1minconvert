@@ -234,6 +234,9 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
       setResultBlob(converted.blob);
       setDimensions({ width: converted.width, height: converted.height });
       setStatus("success");
+      if (typeof window !== "undefined" && typeof window.gtag === "function" && localStorage.getItem("1minconvert-consent-v1") === "accepted") {
+        window.gtag("event", "conversion_completed", { tool: tool.slug, output_format: outputFormat });
+      }
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : "Something went wrong while processing this image.";
       setError(message.includes("heic2any") || message.includes("HEIC")
@@ -256,6 +259,9 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
     link.download = filename;
     document.body.appendChild(link);
     link.click();
+    if (typeof window !== "undefined" && typeof window.gtag === "function" && localStorage.getItem("1minconvert-consent-v1") === "accepted") {
+      window.gtag("event", "file_downloaded", { tool: tool.slug, output_format: actualFormat });
+    }
     link.remove();
   }
 

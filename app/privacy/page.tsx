@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         <p className="simple-lead">
           This policy explains how 1MinConvert handles information when you visit the site and use its file tools.
         </p>
-        <p><strong>Last updated:</strong> October 26, 2026</p>
+        <p><strong>Last updated:</strong> November 3, 2026</p>
 
         <h2>Files you process</h2>
         <p>
@@ -37,22 +37,28 @@ export default function PrivacyPage() {
 
         <h2>Cookies, analytics and advertising</h2>
         <p>
-          1MinConvert does not claim that no cookies or similar technologies are used in every configuration. If
-          analytics, advertising or other third-party features are enabled, those providers may use cookies or similar
-          technologies and may process information under their own privacy policies. Before advertising is activated,
-          this policy and any required consent controls must reflect the actual advertising setup, including Google
-          AdSense where used.
+          We use Google Analytics 4 to measure visits and website usage when you accept optional tracking.
+          Google Analytics may process usage events, browser and device information, and similar identifiers.
+          We do not intentionally send your uploaded images, filenames or document contents to Analytics.
+          We use Google AdSense for advertising and site verification. Google and its partners may use cookies,
+          identifiers and similar technologies for ad delivery, measurement and personalization according to your
+          choices and applicable law. Google's privacy information is available at
+          {" "}<a href="https://policies.google.com/privacy">Google Privacy Policy</a>.
+        </p>
+        <p>
+          Our privacy banner lets you accept or reject optional Google analytics and advertising storage, and
+          reopen preferences later. A small browser storage value remembers your choice. Essential technical
+          operations may still be necessary to deliver and protect the website. Consent settings and the use of
+          Google advertising technologies may vary by region; additional certified consent management is required
+          where Google's publisher rules apply.
         </p>
 
-        <h2>Contact form submissions</h2>
+        <h2>Contact by email</h2>
         <p>
-          If you submit the contact form, we receive the name, email address, topic and message you choose to provide.
-          The form is handled by Netlify Forms on our hosting platform. The information is stored in the site owner's
-          Netlify dashboard and may be sent to a notification address configured by the site owner so the request can
-          be answered. Netlify may apply automated spam filtering. Do not include passwords, payment details, private
-          files or other sensitive information in a message. Contact-form submissions are retained until the site owner
-          deletes them, subject to the hosting provider's functionality, retention practices and any applicable legal
-          obligations. You can request access to or deletion of a message by contacting us.
+          Our contact page offers an email link rather than an online form. If you email us, we receive the email
+          address, message and any details you voluntarily include. Messages sent to contact@1minconvert.com are
+          forwarded to the site's support inbox using our domain email forwarding service. We use them to respond
+          to your enquiry and retain them as needed for support, record-keeping and legal obligations.
         </p>
 
         <h2>How information is used</h2>
@@ -91,11 +97,7 @@ export default function PrivacyPage() {
 
         <h2>Contact</h2>
         <p>Privacy questions can be sent to <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>
-        <div className="legal-warning">
-          This page describes the current intended product and is not legal advice. Before public launch, confirm that
-          the live hosting, analytics, cookie, consent and advertising configuration matches this policy and obtain any
-          jurisdiction-specific review required for your circumstances.
-        </div>
+
       </div>
     </div>
   );
