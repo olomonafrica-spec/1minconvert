@@ -3,7 +3,7 @@ import "./globals.css";
 import { SiteHeader, SiteFooter } from "@/components/site-shell";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://1minconvert.com"),
+  metadataBase: new URL("https://1minconvert.com"),
   title: {
     default: "Free Online Image Converter Tools | 1MinConvert",
     template: "%s | 1MinConvert",

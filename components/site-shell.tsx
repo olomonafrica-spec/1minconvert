@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { ArrowUpRight, Command, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, ShieldCheck } from "lucide-react";
 
 export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="container nav-wrap">
         <Link href="/" className="brand" aria-label="1MinConvert home">
-          <span className="brand-mark"><Command size={21} strokeWidth={2.5} /></span>
+          <img className="brand-logo-icon" src="/1minconvert-mark.png" alt="" width="40" height="40" />
           <span className="brand-word">1MIN<span>CONVERT</span></span>
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
@@ -26,7 +26,7 @@ export function SiteFooter() {
       <div className="container footer-top">
         <div className="footer-brand-block">
           <Link href="/" className="brand brand-footer">
-            <span className="brand-mark"><Command size={20} strokeWidth={2.5} /></span>
+            <img className="brand-logo-icon" src="/1minconvert-mark.png" alt="" width="40" height="40" />
             <span className="brand-word">1MIN<span>CONVERT</span></span>
           </Link>
           <p>Thoughtful online tools for everyday file tasks. Simple to use, clear about privacy.</p>

@@ -1,12 +1,13 @@
 "use client";
 
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
-import { AlertCircle, ArrowDownToLine, ArrowLeft, CheckCircle2, FileImage, FileType, FileUp, Gauge, Image as ImageIcon, LoaderCircle, LockKeyhole, Maximize2, RefreshCw, Settings2, Sparkles, X } from "lucide-react";
+import { AlertCircle, ArrowDownToLine, ArrowLeft, ArrowLeftRight, CheckCircle2, FileImage, FileType, FileUp, Gauge, Image as ImageIcon, LoaderCircle, LockKeyhole, Maximize2, RefreshCw, Settings2, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import type { ToolDefinition, ToolSlug } from "@/lib/tools";
 
 type Status = "idle" | "processing" | "success" | "error";
 type OutputFormat = "image/jpeg" | "image/png" | "image/webp";
+const formats: OutputFormat[] = ["image/jpeg", "image/png", "image/webp"];
 
 const formatLabels: Record<OutputFormat, string> = {
   "image/jpeg": "JPG",
@@ -40,7 +41,7 @@ async function decodeFile(file: File, forceHeic = false): Promise<{ blob: Blob; 
   return { blob: source, width, height };
 }
 
-async function canvasBlob(file: File, format: OutputFormat, quality: number, targetWidth?: number, targetHeight?: number, forceHeic = false, predecoded?: { blob: Blob; width: number; height: number }) {
+async function canvasBlob(file: File, format: OutputFormat, quality: number, targetWidth?: number, targetHeight?: number, forceHeic = false, predecoded?: { blob: Blob; width: number; height: number }, jpegBackground = "#ffffff") {
   // Reuse the decoded input so HEIC files are not converted twice in one operation.
   const decoded = predecoded ?? await decodeFile(file, forceHeic);
   const keepRatio = !targetWidth || !targetHeight;
@@ -60,7 +61,7 @@ async function canvasBlob(file: File, format: OutputFormat, quality: number, tar
   const context = canvas.getContext("2d", { alpha: format !== "image/jpeg" });
   if (!context) throw new Error("Your browser could not create an image canvas. Try another browser.");
   if (format === "image/jpeg") {
-    context.fillStyle = "#ffffff";
+    context.fillStyle = jpegBackground;
     context.fillRect(0, 0, width, height);
   }
   context.drawImage(bitmap, 0, 0, width, height);
@@ -68,6 +69,7 @@ async function canvasBlob(file: File, format: OutputFormat, quality: number, tar
   const result = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("The image could not be exported. Try another format.")), format, quality);
   });
+  if (result.type !== format) throw new Error("Your browser does not support exporting this image format.");
   return { blob: result, width, height };
 }
 
@@ -83,13 +85,47 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
   const [error, setError] = useState("");
   const [quality, setQuality] = useState(82);
   const [format, setFormat] = useState<OutputFormat>(tool.slug === "heic-to-jpg" ? "image/jpeg" : tool.slug === "webp-converter" ? "image/webp" : "image/webp");
+  const [sourceFormat, setSourceFormat] = useState<OutputFormat>("image/jpeg");
+  const [targetFormat, setTargetFormat] = useState<OutputFormat>("image/webp");
+  const [jpegBackground, setJpegBackground] = useState("#ffffff");
   const [width, setWidth] = useState(1200);
   const [height, setHeight] = useState(800);
   const [keepRatio, setKeepRatio] = useState(true);
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const [dragging, setDragging] = useState(false);
 
-  const accept = tool.slug === "heic-to-jpg" ? ".heic,.heif,image/heic,image/heif" : "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp";
+  const accept = tool.slug === "heic-to-jpg" ? ".heic,.heif,image/heic,image/heif" : tool.slug === "webp-converter" ? (sourceFormat === "image/jpeg" ? ".jpg,.jpeg,image/jpeg" : sourceFormat === "image/png" ? ".png,image/png" : ".webp,image/webp") : "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp";
+
+  function resetSelectedImage() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (resultUrl) URL.revokeObjectURL(resultUrl);
+    setFile(null);
+    setPreviewUrl("");
+    setResultUrl("");
+    setResultBlob(null);
+    setDimensions(null);
+    setStatus("idle");
+    setError("");
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  function changeSource(next: OutputFormat) {
+    resetSelectedImage();
+    setSourceFormat(next);
+    if (next === targetFormat) setTargetFormat(formats.find((item) => item !== next)!);
+  }
+
+  function changeTarget(next: OutputFormat) {
+    resetSelectedImage();
+    setTargetFormat(next);
+    if (next === sourceFormat) setSourceFormat(formats.find((item) => item !== next)!);
+  }
+
+  function swapFormats() {
+    resetSelectedImage();
+    setSourceFormat(targetFormat);
+    setTargetFormat(sourceFormat);
+  }
 
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -116,6 +152,10 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
     const supported = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"].includes(next.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(next.name);
     if (!supported) {
       setError("That file type isn't supported by this tool. Choose a supported image file.");
+      return;
+    }
+    if (tool.slug === "webp-converter" && next.type !== sourceFormat && !(next.type === "" && (sourceFormat === "image/jpeg" ? /\.jpe?g$/i : sourceFormat === "image/png" ? /\.png$/i : /\.webp$/i).test(next.name))) {
+      setError(`Please select a ${formatLabels[sourceFormat]} image, or change the From format.`);
       return;
     }
     if (tool.slug === "heic-to-jpg" && !isHeic) {
@@ -164,7 +204,7 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
     setError("");
     try {
       const heic = tool.slug === "heic-to-jpg";
-      const outputFormat: OutputFormat = heic ? "image/jpeg" : format;
+      const outputFormat: OutputFormat = heic ? "image/jpeg" : tool.slug === "webp-converter" ? targetFormat : format;
       const requestedWidth = tool.slug === "image-resizer" ? Math.max(1, width) : undefined;
       const requestedHeight = tool.slug === "image-resizer" && !keepRatio ? Math.max(1, height) : undefined;
       const initial = await decodeFile(file, heic);
@@ -181,12 +221,12 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
             finalHeight = maxHeight;
             finalWidth = Math.round(finalHeight * ratio);
           }
-          converted = await canvasBlob(file, outputFormat, quality / 100, finalWidth, finalHeight, heic, initial);
+          converted = await canvasBlob(file, outputFormat, quality / 100, finalWidth, finalHeight, heic, initial, jpegBackground);
         } else {
-          converted = await canvasBlob(file, outputFormat, quality / 100, requestedWidth, requestedHeight, heic, initial);
+          converted = await canvasBlob(file, outputFormat, quality / 100, requestedWidth, requestedHeight, heic, initial, jpegBackground);
         }
       } else {
-        converted = await canvasBlob(file, outputFormat, quality / 100, undefined, undefined, heic, initial);
+        converted = await canvasBlob(file, outputFormat, quality / 100, undefined, undefined, heic, initial, jpegBackground);
       }
       const url = URL.createObjectURL(converted.blob);
       if (resultUrl) URL.revokeObjectURL(resultUrl);
@@ -205,11 +245,12 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
 
   function download() {
     if (!resultUrl || !resultBlob || !file) return;
-    const extension = formatLabels[tool.slug === "heic-to-jpg" ? "image/jpeg" : format].toLowerCase();
-    const suffix = tool.slug === "image-compressor" ? "-compressed" : tool.slug === "image-resizer" ? "-resized" : `.${extension}`;
+    const actualFormat = tool.slug === "heic-to-jpg" ? "image/jpeg" : tool.slug === "webp-converter" ? targetFormat : format;
+    const extension = actualFormat === "image/jpeg" ? "jpg" : formatLabels[actualFormat].toLowerCase();
+    const suffix = tool.slug === "image-compressor" ? "-compressed" : tool.slug === "image-resizer" ? "-resized" : `-${extension}`;
     const filename = tool.slug === "image-compressor" || tool.slug === "image-resizer"
       ? `${safeBaseName(file.name)}${suffix}.${extension}`
-      : `${safeBaseName(file.name)}-${extension === "jpeg" ? "jpg" : extension}.${extension}`;
+      : `${safeBaseName(file.name)}-${extension}.${extension}`;
     const link = document.createElement("a");
     link.href = resultUrl;
     link.download = filename;
@@ -220,7 +261,7 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
 
   const resultSize = resultBlob ? formatBytes(resultBlob.size) : "—";
   const savings = resultBlob && file ? Math.round((1 - resultBlob.size / file.size) * 100) : 0;
-  const outputLabel = formatLabels[tool.slug === "heic-to-jpg" ? "image/jpeg" : format];
+  const outputLabel = formatLabels[tool.slug === "heic-to-jpg" ? "image/jpeg" : tool.slug === "webp-converter" ? targetFormat : format];
 
   return (
     <div className="tool-page">
@@ -237,16 +278,36 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
           <div className="tool-mark-large"><ToolIcon size={34} strokeWidth={1.8}/><span className="tool-mark-spark"><Sparkles size={14}/></span></div>
         </div>
 
+        {tool.slug === "webp-converter" && (
+          <div className="conversion-switcher" aria-label="Image format conversion">
+            <div className="conversion-switcher-top">
+              <div><strong>Choose your formats</strong><p>Convert between JPG, PNG and WebP in either direction.</p></div>
+            </div>
+            <div className="conversion-direction conversion-selectors">
+              <label className="conversion-select-group" htmlFor="conversion-from">From
+                <select id="conversion-from" className="select-control" value={sourceFormat} onChange={(event) => changeSource(event.target.value as OutputFormat)}>
+                  {formats.map((item) => <option key={item} value={item}>{formatLabels[item]}</option>)}
+                </select>
+              </label>
+              <button type="button" className="conversion-swap" onClick={swapFormats} aria-label="Swap input and output formats" title="Swap formats"><ArrowLeftRight size={20}/></button>
+              <label className="conversion-select-group" htmlFor="conversion-to">To
+                <select id="conversion-to" className="select-control" value={targetFormat} onChange={(event) => changeTarget(event.target.value as OutputFormat)}>
+                  {formats.map((item) => <option key={item} value={item}>{formatLabels[item]}</option>)}
+                </select>
+              </label>
+            </div>
+          </div>
+        )}
         <div className="workbench">
           <section className="upload-column" aria-label="Upload and convert image">
             {!file ? (
               <div className={`dropzone ${dragging ? "is-dragging" : ""}`} onDragOver={(e) => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={onDrop}>
                 <input ref={inputRef} type="file" accept={accept} onChange={onInput} className="visually-hidden" aria-label="Choose image file" />
                 <div className="drop-icon"><FileUp size={30}/></div>
-                <h2>Drop your image here</h2>
+                <h2>{tool.slug === "webp-converter" ? `Drop your ${formatLabels[sourceFormat]} image here` : "Drop your image here"}</h2>
                 <p>or browse files on your device</p>
                 <button className="button button-primary" onClick={() => inputRef.current?.click()}>Choose image <ArrowDownToLine size={16}/></button>
-                <div className="drop-meta"><span>Max 40 MB</span><span className="meta-divider"/><span>{tool.slug === "heic-to-jpg" ? "HEIC, HEIF" : "JPG, PNG, WebP"}</span></div>
+                <div className="drop-meta"><span>Max 40 MB</span><span className="meta-divider"/><span>{tool.slug === "heic-to-jpg" ? "HEIC, HEIF" : tool.slug === "webp-converter" ? formatLabels[sourceFormat] : "JPG, PNG, WebP"}</span></div>
               </div>
             ) : (
               <div className="file-panel">
@@ -267,7 +328,7 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
             {tool.slug === "heic-to-jpg" ? (
               <div className="setting-block"><label>Output format</label><div className="format-lock"><span className="format-badge jpg-badge">JPG</span><div><strong>JPEG image</strong><small>Works across most devices and apps</small></div><CheckCircle2 size={17}/></div></div>
             ) : tool.slug === "webp-converter" ? (
-              <div className="setting-block"><label htmlFor="output-format">Convert to</label><select id="output-format" className="select-control" value={format} onChange={(e) => setFormat(e.target.value as OutputFormat)}><option value="image/webp">WebP — modern web format</option><option value="image/jpeg">JPG — widely compatible</option><option value="image/png">PNG — supports transparency</option></select></div>
+              <div className="setting-block"><label>Output format</label><div className="format-lock"><span className="format-badge jpg-badge">{formatLabels[targetFormat]}</span><div><strong>{formatLabels[sourceFormat]} to {formatLabels[targetFormat]}</strong><small>Choose any supported format above</small></div><CheckCircle2 size={17}/></div></div>
             ) : (
               <div className="setting-block"><label htmlFor="output-format">Output format</label><select id="output-format" className="select-control" value={format} onChange={(e) => setFormat(e.target.value as OutputFormat)}><option value="image/webp">WebP</option><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select></div>
             )}
@@ -276,8 +337,9 @@ export function ToolWorkbench({ tool }: { tool: ToolDefinition }) {
 
             {tool.slug === "image-resizer" && <div className="setting-block"><label>Dimensions (pixels)</label><div className="dimension-inputs"><div><label htmlFor="width">Width</label><input id="width" className="number-control" type="number" min="1" max="12000" value={width} onChange={(e) => changeWidth(Number(e.target.value))}/></div><span className="dimension-x">×</span><div><label htmlFor="height">Height</label><input id="height" className="number-control" type="number" min="1" max="12000" value={height} onChange={(e) => changeHeight(Number(e.target.value))}/></div></div><label className="checkbox-row"><input type="checkbox" checked={keepRatio} onChange={(e) => setKeepRatio(e.target.checked)}/><span>Keep aspect ratio</span></label><p className="setting-help">The image is scaled to fit within these dimensions when the ratio is locked.</p><div className="setting-block nested-setting"><div className="setting-label-row"><label htmlFor="resize-quality">Quality</label><span className="value-chip">{quality}%</span></div><input id="resize-quality" type="range" min="35" max="100" value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="range-control"/></div></div>}
 
-            {tool.slug !== "image-compressor" && tool.slug !== "image-resizer" && <div className="setting-block"><div className="setting-label-row"><label htmlFor="quality">Output quality</label><span className="value-chip">{quality}%</span></div><input id="quality" type="range" min="55" max="100" step="1" value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="range-control"/><div className="range-labels"><span>Smaller file</span><span>Higher quality</span></div></div>}
+            {(tool.slug === "heic-to-jpg" || (tool.slug === "webp-converter" && targetFormat !== "image/png")) && <div className="setting-block"><div className="setting-label-row"><label htmlFor="quality">Output quality</label><span className="value-chip">{quality}%</span></div><input id="quality" type="range" min="55" max="100" step="1" value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="range-control"/><div className="range-labels"><span>Smaller file</span><span>Higher quality</span></div></div>}
 
+            {tool.slug === "webp-converter" && targetFormat === "image/jpeg" && <div className="setting-block"><label htmlFor="jpeg-background">Background for transparent images</label><div className="background-picker"><input id="jpeg-background" type="color" value={jpegBackground} onChange={(event) => { setJpegBackground(event.target.value); clearResult(); }}/><span>{jpegBackground.toUpperCase()}</span></div><p className="setting-help">JPG does not support transparency. Transparent areas become this color.</p></div>}
             {tool.slug === "webp-converter" && <div className="tip-card"><Sparkles size={17}/><div><strong>Quick tip</strong><p>WebP can reduce file size for websites. JPG does not preserve transparency; use PNG or WebP when transparency matters.</p></div></div>}
             {tool.slug === "heic-to-jpg" && <div className="tip-card"><Sparkles size={17}/><div><strong>Why convert HEIC?</strong><p>JPG is widely supported by websites, older apps and devices that may not open HEIC photos.</p></div></div>}
             <div className="settings-spacer"/>

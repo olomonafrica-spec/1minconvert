@@ -1,22 +1,6 @@
 import type { MetadataRoute } from "next";
-
+import { tools } from "@/lib/tools";
 const baseUrl = "https://1minconvert.com";
-
-const routes = [
-  "",
-  "/about",
-  "/contact",
-  "/privacy",
-  "/terms",
-  "/tools/heic-to-jpg",
-  "/tools/webp-converter",
-  "/tools/image-compressor",
-  "/tools/image-resizer",
-];
-
 export default function sitemap(): MetadataRoute.Sitemap {
-  return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
-    changeFrequency: "monthly",
-  }));
+  return ["", "/about", "/contact", "/privacy", "/terms", ...tools.map(tool => `/tools/${tool.slug}`)].map(route => ({url: `${baseUrl}${route}`}));
 }
