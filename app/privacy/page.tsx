@@ -46,11 +46,11 @@ export default function PrivacyPage() {
           {" "}<a href="https://policies.google.com/privacy">Google Privacy Policy</a>.
         </p>
         <p>
-          Our privacy banner lets you accept or reject optional Google analytics and advertising storage, and
-          reopen preferences later. A small browser storage value remembers your choice. Essential technical
-          operations may still be necessary to deliver and protect the website. Consent settings and the use of
-          Google advertising technologies may vary by region; additional certified consent management is required
-          where Google's publisher rules apply.
+          Our analytics preferences banner lets you accept or reject optional Google Analytics tracking, and
+          reopen that choice later. A small browser storage value remembers your analytics preference.
+          Advertising privacy choices are handled separately by Google's Privacy & messaging system in
+          regions where its messages are configured. Declining analytics does not prevent essential
+          technical processing required to deliver and secure the website.
         </p>
 
         <h2>Contact by email</h2>
