@@ -5,6 +5,7 @@ import "./globals.css";
 
 const siteUrl = "https://1minconvert.com";
 const adsenseId = "ca-pub-7148962958151517";
+const gaId = "G-P2X8P75880";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
     follow: true,
   },
 
-  // Google AdSense site ownership verification
+  // AdSense ownership verification
   other: {
     "google-adsense-account": adsenseId,
   },
@@ -65,6 +66,26 @@ export default function RootLayout({
           strategy="afterInteractive"
           crossOrigin="anonymous"
         />
+
+        {/* Google Analytics 4 */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+
+            gtag('js', new Date());
+
+            gtag('config', '${gaId}', {
+              anonymize_ip: true,
+              send_page_view: true
+            });
+          `}
+        </Script>
 
         {children}
       </body>
